@@ -5,11 +5,11 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 
 class LoginData {
-    constructor(username, password) {
-      this.username = username;
-      this.password = password;
-    }
+  constructor(username, password) {
+    this.username = username;
+    this.password = password;
   }
+}
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -20,14 +20,23 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-    const loginData = new LoginData(username, password);
-      const response = await axios.get('http://localhost:5267/api/Member/Login/${loginData}');
+      const loginData = new LoginData(username, password);
 
-      if (response.data.member) {
+      const response = await axios.post(
+        "http://localhost:5267/api/Member/Login",
+        loginData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.data) {
+        // Assuming your response structure has the necessary data
         // Store member data in cookies
-        setCookie("member", response.data.member, { path: "/" });
+        setCookie("member", response.data, { path: "/" });
         // Navigate to EventList page
-        navigate("/event-list");
+        navigate("/pages/EventList/EventList");
       } else {
         setError("Invalid credentials");
       }

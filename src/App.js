@@ -4,10 +4,13 @@ import EventList from "./pages/EventList/EventList";
 import { Routes, Route } from "react-router-dom";
 import UpdateEventList from "./pages/EventList/UpdateEventList";
 import Login from "./components/Login";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
     <>
+     <ToastContainer />
       <Routes>
         <Route
           path="/"

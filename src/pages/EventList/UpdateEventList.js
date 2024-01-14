@@ -1,37 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import axios from "axios";
 import NavBar from "../../components/NavBar";
 import { useLocation, Link } from "react-router-dom";
-import { useState } from "react";
+import { useCookies } from "react-cookie";
+import { toast } from 'react-toastify';
 
-function BookTicket() {
+const UpdateEventList = () => {
   const [display, setDisplay] = useState("false");
-
+  const [cookies] = useCookies(["member"]);
   const validationSchema = Yup.object().shape({
-    eventId: Yup.number().required("Event ID is required").positive().integer(),
-    memberId: Yup.number().required("Member ID is required").positive().integer(),
-    ticketType: Yup.string().required("Ticket Type is required"),
+    ticketType: Yup.string().required(),
   });
-
   const location = useLocation();
   const data = location.state;
 
   const formik = useFormik({
     initialValues: {
-      eventId: data.eventId || 0,
-      memberId: data.memberId || 0,
-      ticketType: "", // Initial value can be set based on your requirements
+      ticketType: "free", // Set a default ticketType (you can change it based on your requirements)
     },
-    onSubmit: (values) => {
-      axios.post("http://localhost:5267/api/BookTicket", {
-        eventId: values.eventId,
-        memberId: values.memberId,
-        ticketType: values.ticketType,
-      });
+    onSubmit: async () => {
+      try {
+        const memberId = cookies.member.id; // Retrieve memberId from cookies
+        const response = await axios.post("http://localhost:5267/api/Ticket", {
+          eventId: data.id,
+          memberId: memberId,
+          Type: formik.values.ticketType,
+        });
 
-      setDisplay("true");
+        if (response.status === 200) {
+          // Handle success: Show success message
+          toast.success('Ticket booked successfully');
+        }
+      
+        setDisplay("true");
+      } catch (error) {
+        // Handle API request error: Show an error message
+        console.log(error);
+        toast.error(`Error booking ticket: ${error.response.data}`);
+      }
     },
     validationSchema: validationSchema,
   });
@@ -39,68 +47,62 @@ function BookTicket() {
   return (
     <>
       <NavBar
-        title="Book Ticket"
+        title="Update Event List"
         btn="Go Back"
         classN="btn btn-warning"
         path="/pages/EventList/EventList"
       />
-      <div className="container-sm">
-        <form onSubmit={formik.handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label">Event ID</label>
-            <input
-              type="number"
-              id="eventId"
-              className="form-control"
-              onChange={formik.handleChange}
-              value={formik.values.eventId}
-            />
-            {formik.errors.eventId ? (
-              <div className="color-form">{formik.errors.eventId}</div>
-            ) : null}
+      <div className="container-sm text-center">
+        {/* Display seats data side by side in separate boxes */}
+        <div className="d-flex justify-content-around mb-4">
+          <div className="border p-3">
+            <h4>VIP</h4>
+            <div className="mb-2">Number of VIP Seats: {data.vipSeats.numberOfSeats || 0}</div>
+            <div>Price: {data.vipSeats.price || 0}</div>
           </div>
-          <div className="mb-3">
-            <label className="form-label">Member ID</label>
-            <input
-              type="number"
-              id="memberId"
-              className="form-control"
-              onChange={formik.handleChange}
-              value={formik.values.memberId}
-            />
-            {formik.errors.memberId ? (
-              <div className="color-form">{formik.errors.memberId}</div>
-            ) : null}
+          <div className="border p-3">
+            <h4>Free</h4>
+            <div className="mb-2">Number of Free Seats: {data.freeSeats.numberOfSeats || 0}</div>
+            <div>Price: {data.freeSeats.price || 0}</div>
           </div>
-          <div className="mb-3">
-            <label className="form-label">Ticket Type</label>
-            <input
-              type="text"
-              id="ticketType"
-              className="form-control"
-              onChange={formik.handleChange}
-              value={formik.values.ticketType}
-            />
-            {formik.errors.ticketType ? (
-              <div className="color-form">{formik.errors.ticketType}</div>
-            ) : null}
-          </div>
-          <button type="submit" className="btn btn-success">
-            Book Ticket
-          </button>
-          {display === "true" ? (
-            <Link
-              to="/pages/EventList/EventList"
-              className="btn btn-warning ms-3"
-              type="button"
-            >
-              Go back
-            </Link>
-          ) : null}
-        </form>
+        </div>
+
+        {/* Dropdown for selecting ticket type */}
+        <div className="mb-3">
+          <label className="form-label">Select Ticket Type</label>
+          <select
+            id="ticketType"
+            name="ticketType"
+            className="form-select"
+            onChange={formik.handleChange}
+            value={formik.values.ticketType}
+          >
+            <option value="VIP">VIP</option>
+            <option value="free">Free</option>
+          </select>
+          {formik.errors.ticketType && (
+            <div className="color-form">{formik.errors.ticketType}</div>
+          )}
+        </div>
+
+        {/* "Book" button to call CreateTicket endpoint */}
+        <button type="button" className="btn btn-success" onClick={formik.handleSubmit}>
+          Book Ticket
+        </button>
+
+        {/* Display "Go back" link if display is true */}
+        {display === "true" && (
+          <Link
+            to="/pages/EventList/EventList"
+            className="btn btn-warning ms-3"
+            type="button"
+          >
+            Go back
+          </Link>
+        )}
       </div>
     </>
   );
-}
+};
 
-export default BookTicket;
+export default UpdateEventList;
