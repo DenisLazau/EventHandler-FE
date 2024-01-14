@@ -6,10 +6,10 @@ function Event() {
   return (
     <>
       <NavBar
-        title="Event"
-        btn="Update/Delete"
+        title="SignUp"
+        btn="Back to Login"
         classN="btn btn-outline-success"
-        path="../pages/EventList/EventList"
+        path="/"
       />
 
       <div className="container-sm">

@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import axios from "axios";
 
 function MemberCreationForm() {
+  const membershipOptions = ["Free", "VIP"];
   const validationSchema = Yup.object().shape({
     firstName: Yup.string().required("First Name is required"),
     lastName: Yup.string().required("Last Name is required"),
@@ -106,17 +107,26 @@ function MemberCreationForm() {
       </div>
       <div className="mb-3">
         <label className="form-label">Membership</label>
-        <input
-          type="text"
+        <select
           id="membership"
-          className="form-control"
+          name="membership"
+          className="form-select"
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           value={formik.values.membership}
-        />
+        >
+          <option value="" label="Select Membership" />
+          {membershipOptions.map((option) => (
+            <option key={option} value={option.toLowerCase()}>
+              {option}
+            </option>
+          ))}
+        </select>
         {formik.errors.membership ? (
           <div className="color-form">{formik.errors.membership}</div>
         ) : null}
       </div>
+
       <button type="submit" className="btn btn-primary">
         Submit
       </button>
