@@ -15,6 +15,7 @@ const UpdateEventList = () => {
   });
   const location = useLocation();
   const data = location.state;
+  console.log(data);
 
   const formik = useFormik({
     initialValues: {

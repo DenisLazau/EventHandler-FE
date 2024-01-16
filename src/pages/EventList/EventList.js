@@ -103,12 +103,12 @@ function EventList() {
           localizer={localizer}
           events={eventList.map((event) => ({
             id: event.eventId,
-            title: event.EventName,
+            title: event.event_name,
             start: new Date(event.date),
             end: new Date(event.date),
             seats: event.seats,
             date: event.date,
-            name: event.EventName,
+            name: event.event_name,
             category: event.event_Type,
           }))}
           startAccessor="start"
@@ -147,8 +147,8 @@ function EventList() {
                 eventType: selectedEvent.category,
                 eventName: selectedEvent.name,
                 date: selectedEvent.date,
-                vipSeats: selectedEvent.seats.find((seat) => seat.seatType === "VIP")?.numberOfSeats || 0,
-                freeSeats: selectedEvent.seats.find((seat) => seat.seatType === "free")?.numberOfSeats || 0,
+                vipSeats: selectedEvent.seats.find((seat) => seat.seatType === "VIP"),
+                freeSeats: selectedEvent.seats.find((seat) => seat.seatType === "free"),
               }}
               className="btn btn-success ms-3"
             >
